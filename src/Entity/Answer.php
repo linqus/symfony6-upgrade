@@ -16,23 +16,23 @@ class Answer
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private $id;
+    #[ORM\Column()]
+    private ?int $id = null;
 
     #[ORM\Column(type: 'text')]
     private ?string $content = null;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column()]
     private ?string $username = null;
 
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column()]
     private int $votes = 0;
 
-    #[ORM\ManyToOne(targetEntity: Question::class, inversedBy: 'answers')]
+    #[ORM\ManyToOne(inversedBy: 'answers')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?\App\Entity\Question $question = null;
+    private ?Question $question = null;
 
-    #[ORM\Column(type: 'string', length: 15)]
+    #[ORM\Column(length: 15)]
     private string $status = self::STATUS_NEEDS_APPROVAL;
 
     public function getId(): ?int

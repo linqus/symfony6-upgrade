@@ -10,18 +10,18 @@ class QuestionTag
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private $id;
+    #[ORM\Column()]
+    private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: Question::class, inversedBy: 'questionTags')]
+    #[ORM\ManyToOne(inversedBy: 'questionTags')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?\App\Entity\Question $question = null;
+    private ?Question $question = null;
 
-    #[ORM\ManyToOne(targetEntity: Tag::class)]
+    #[ORM\ManyToOne()]
     #[ORM\JoinColumn(nullable: false)]
-    private ?\App\Entity\Tag $tag = null;
+    private ?Tag $tag = null;
 
-    #[ORM\Column(type: 'datetime_immutable')]
+    #[ORM\Column()]
     private \DateTimeImmutable $taggedAt;
 
     public function __construct()

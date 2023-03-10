@@ -8,7 +8,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\Mapping\Annotation\Slug;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
+
 
 #[ORM\Entity(repositoryClass: QuestionRepository::class)]
 class Question
@@ -17,16 +19,14 @@ class Question
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private $id;
+    #[ORM\Column()]
+    private ?int $id = null;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column()]
     private ?string $name = null;
 
-    /**
-     * @Gedmo\Slug(fields={"name"})
-     */
-    #[ORM\Column(type: 'string', length: 100, unique: true)]
+    #[Slug(fields: ['name'])]
+    #[ORM\Column(length: 100, unique: true)]
     private ?string $slug = null;
 
     #[ORM\Column(type: 'text')]
@@ -40,14 +40,14 @@ class Question
 
     #[ORM\OneToMany(targetEntity: Answer::class, mappedBy: 'question', fetch: 'EXTRA_LAZY')]
     #[ORM\OrderBy(['createdAt' => 'DESC'])]
-    private $answers;
+    private Collection $answers;
 
     #[ORM\OneToMany(targetEntity: QuestionTag::class, mappedBy: 'question')]
-    private $questionTags;
+    private Collection $questionTags;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'questions')]
+    #[ORM\ManyToOne(inversedBy: 'questions')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?\App\Entity\User $owner = null;
+    private ?User $owner = null;
 
     public function __construct()
     {

@@ -11,7 +11,7 @@ class UserController extends BaseController
      * @Route("/api/me", name="app_user_api_me")
      * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
      */
-    public function apiMe()
+    public function apiMe(): \Symfony\Component\HttpFoundation\JsonResponse
     {
         return $this->json($this->getUser(), 200, [], [
             'groups' => ['user:read'],

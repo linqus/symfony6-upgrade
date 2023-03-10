@@ -34,7 +34,7 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator implements P
     private $csrfTokenManager;
     private $passwordEncoder;
 
-    public function __construct(SessionInterface $session, EntityManagerInterface $entityManager, UrlGeneratorInterface $urlGenerator, CsrfTokenManagerInterface $csrfTokenManager, UserPasswordEncoderInterface $passwordEncoder)
+    public function __construct(SessionInterface $session, EntityManagerInterface $entityManager, UrlGeneratorInterface $urlGenerator, CsrfTokenManagerInterface $csrfTokenManager, \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface $passwordEncoder)
     {
         $this->session = $session;
         $this->entityManager = $entityManager;
@@ -74,7 +74,7 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator implements P
         $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $credentials['email']]);
 
         if (!$user) {
-            throw new UsernameNotFoundException('Email could not be found.');
+            throw new \Symfony\Component\Security\Core\Exception\UserNotFoundException('Email could not be found.');
         }
 
         return $user;

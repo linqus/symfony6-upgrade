@@ -24,7 +24,6 @@ class Question
     private ?string $name = null;
 
     /**
-     *
      * @Gedmo\Slug(fields={"name"})
      */
     #[ORM\Column(type: 'string', length: 100, unique: true)]
@@ -41,10 +40,10 @@ class Question
 
     #[ORM\OneToMany(targetEntity: Answer::class, mappedBy: 'question', fetch: 'EXTRA_LAZY')]
     #[ORM\OrderBy(['createdAt' => 'DESC'])]
-    private  $answers;
+    private $answers;
 
     #[ORM\OneToMany(targetEntity: QuestionTag::class, mappedBy: 'question')]
-    private  $questionTags;
+    private $questionTags;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'questions')]
     #[ORM\JoinColumn(nullable: false)]

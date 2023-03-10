@@ -33,7 +33,7 @@ class User implements UserInterface
     private ?string $firstName = null;
 
     #[ORM\OneToMany(targetEntity: Question::class, mappedBy: 'owner')]
-    private  $questions;
+    private $questions;
 
     #[ORM\Column(type: 'boolean')]
     private bool $isVerified = false;

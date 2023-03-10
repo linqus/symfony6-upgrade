@@ -29,13 +29,9 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
  */
 final class UserFactory extends ModelFactory
 {
-    private UserPasswordHasherInterface $userPasswordHasher;
-
-    public function __construct(UserPasswordHasherInterface $userPasswordHasher)
+    public function __construct(private UserPasswordHasherInterface $userPasswordHasher)
     {
         parent::__construct();
-
-        $this->userPasswordHasher = $userPasswordHasher;
     }
 
     protected function getDefaults(): array

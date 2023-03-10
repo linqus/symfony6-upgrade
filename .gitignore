@@ -20,3 +20,6 @@ yarn-error.log
 /phpunit.xml
 .phpunit.result.cache
 ###< phpunit/phpunit ###
+
+/tools/php-cs-fixer/vendor
+/.php-cs-fixer.cache

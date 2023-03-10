@@ -9,8 +9,11 @@ use Symfony\Contracts\Cache\CacheInterface;
 class MarkdownHelper
 {
     private $markdownParser;
+
     private $cache;
+
     private $isDebug;
+
     private $logger;
 
     public function __construct(MarkdownParserInterface $markdownParser, CacheInterface $cache, bool $isDebug, LoggerInterface $mdLogger)

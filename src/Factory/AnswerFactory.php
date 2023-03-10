@@ -11,20 +11,20 @@ use Zenstruck\Foundry\RepositoryProxy;
 /**
  * @extends ModelFactory<Answer>
  *
- * @method static       Answer|Proxy createOne(array $attributes = [])
- * @method static       Answer[]|Proxy[] createMany(int $number, array|callable $attributes = [])
- * @method static       Answer|Proxy find(object|array|mixed $criteria)
- * @method static       Answer|Proxy findOrCreate(array $attributes)
- * @method static       Answer|Proxy first(string $sortedField = 'id')
- * @method static       Answer|Proxy last(string $sortedField = 'id')
- * @method static       Answer|Proxy random(array $attributes = [])
- * @method static       Answer|Proxy randomOrCreate(array $attributes = [])
- * @method static       Answer[]|Proxy[] all()
- * @method static       Answer[]|Proxy[] findBy(array $attributes)
- * @method static       Answer[]|Proxy[] randomSet(int $number, array $attributes = [])
- * @method static       Answer[]|Proxy[] randomRange(int $min, int $max, array $attributes = [])
- * @method static       AnswerRepository|RepositoryProxy repository()
- * @method Answer|Proxy create(array|callable $attributes = [])
+ * @method static Answer|Proxy                     createOne(array $attributes = [])
+ * @method static Answer[]|Proxy[]                 createMany(int $number, array|callable $attributes = [])
+ * @method static Answer|Proxy                     find(object|array|mixed $criteria)
+ * @method static Answer|Proxy                     findOrCreate(array $attributes)
+ * @method static Answer|Proxy                     first(string $sortedField = 'id')
+ * @method static Answer|Proxy                     last(string $sortedField = 'id')
+ * @method static Answer|Proxy                     random(array $attributes = [])
+ * @method static Answer|Proxy                     randomOrCreate(array $attributes = [])
+ * @method static Answer[]|Proxy[]                 all()
+ * @method static Answer[]|Proxy[]                 findBy(array $attributes)
+ * @method static Answer[]|Proxy[]                 randomSet(int $number, array $attributes = [])
+ * @method static Answer[]|Proxy[]                 randomRange(int $min, int $max, array $attributes = [])
+ * @method static AnswerRepository|RepositoryProxy repository()
+ * @method        Answer|Proxy                     create(array|callable $attributes = [])
  */
 final class AnswerFactory extends ModelFactory
 {

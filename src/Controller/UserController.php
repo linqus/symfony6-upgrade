@@ -9,6 +9,7 @@ class UserController extends BaseController
 {
     /**
      * @Route("/api/me", name="app_user_api_me")
+     *
      * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
      */
     public function apiMe(): \Symfony\Component\HttpFoundation\JsonResponse

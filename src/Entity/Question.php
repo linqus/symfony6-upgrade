@@ -19,7 +19,9 @@ class Question
 
     /**
      * @ORM\Id()
+     *
      * @ORM\GeneratedValue()
+     *
      * @ORM\Column(type="integer")
      */
     private $id;
@@ -31,6 +33,7 @@ class Question
 
     /**
      * @ORM\Column(type="string", length=100, unique=true)
+     *
      * @Gedmo\Slug(fields={"name"})
      */
     private $slug;
@@ -52,6 +55,7 @@ class Question
 
     /**
      * @ORM\OneToMany(targetEntity=Answer::class, mappedBy="question", fetch="EXTRA_LAZY")
+     *
      * @ORM\OrderBy({"createdAt" = "DESC"})
      */
     private $answers;
@@ -63,6 +67,7 @@ class Question
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="questions")
+     *
      * @ORM\JoinColumn(nullable=false)
      */
     private $owner;

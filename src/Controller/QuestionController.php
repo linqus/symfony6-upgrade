@@ -28,7 +28,7 @@ class QuestionController extends AbstractController
     /**
      * @Route("/{page<\d+>}", name="app_homepage")
      */
-    public function homepage(QuestionRepository $repository, int $page = 1): \Symfony\Component\HttpFoundation\Response
+    public function homepage(QuestionRepository $repository, int $page = 1): Response
     {
         $queryBuilder = $repository->createAskedOrderedByNewestQueryBuilder();
 
@@ -43,6 +43,7 @@ class QuestionController extends AbstractController
 
     /**
      * @Route("/questions/new")
+     *
      * @IsGranted("ROLE_USER")
      */
     public function new()
@@ -53,7 +54,7 @@ class QuestionController extends AbstractController
     /**
      * @Route("/questions/{slug}", name="app_question_show")
      */
-    public function show(Question $question): \Symfony\Component\HttpFoundation\Response
+    public function show(Question $question): Response
     {
         if ($this->isDebug) {
             $this->logger->info('We are in debug mode!');
@@ -67,7 +68,7 @@ class QuestionController extends AbstractController
     /**
      * @Route("/questions/edit/{slug}", name="app_question_edit")
      */
-    public function edit(Question $question): \Symfony\Component\HttpFoundation\Response
+    public function edit(Question $question): Response
     {
         $this->denyAccessUnlessGranted('EDIT', $question);
 

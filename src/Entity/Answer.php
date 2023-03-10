@@ -18,7 +18,9 @@ class Answer
 
     /**
      * @ORM\Id
+     *
      * @ORM\GeneratedValue
+     *
      * @ORM\Column(type="integer")
      */
     private $id;
@@ -40,6 +42,7 @@ class Answer
 
     /**
      * @ORM\ManyToOne(targetEntity=Question::class, inversedBy="answers")
+     *
      * @ORM\JoinColumn(nullable=false)
      */
     private $question;

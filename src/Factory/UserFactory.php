@@ -4,38 +4,38 @@ namespace App\Factory;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\RepositoryProxy;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
  * @extends ModelFactory<User>
  *
- * @method static     User|Proxy createOne(array $attributes = [])
- * @method static     User[]|Proxy[] createMany(int $number, array|callable $attributes = [])
- * @method static     User|Proxy find(object|array|mixed $criteria)
- * @method static     User|Proxy findOrCreate(array $attributes)
- * @method static     User|Proxy first(string $sortedField = 'id')
- * @method static     User|Proxy last(string $sortedField = 'id')
- * @method static     User|Proxy random(array $attributes = [])
- * @method static     User|Proxy randomOrCreate(array $attributes = [])
- * @method static     User[]|Proxy[] all()
- * @method static     User[]|Proxy[] findBy(array $attributes)
- * @method static     User[]|Proxy[] randomSet(int $number, array $attributes = [])
- * @method static     User[]|Proxy[] randomRange(int $min, int $max, array $attributes = [])
- * @method static     UserRepository|RepositoryProxy repository()
- * @method User|Proxy create(array|callable $attributes = [])
+ * @method static User|Proxy                     createOne(array $attributes = [])
+ * @method static User[]|Proxy[]                 createMany(int $number, array|callable $attributes = [])
+ * @method static User|Proxy                     find(object|array|mixed $criteria)
+ * @method static User|Proxy                     findOrCreate(array $attributes)
+ * @method static User|Proxy                     first(string $sortedField = 'id')
+ * @method static User|Proxy                     last(string $sortedField = 'id')
+ * @method static User|Proxy                     random(array $attributes = [])
+ * @method static User|Proxy                     randomOrCreate(array $attributes = [])
+ * @method static User[]|Proxy[]                 all()
+ * @method static User[]|Proxy[]                 findBy(array $attributes)
+ * @method static User[]|Proxy[]                 randomSet(int $number, array $attributes = [])
+ * @method static User[]|Proxy[]                 randomRange(int $min, int $max, array $attributes = [])
+ * @method static UserRepository|RepositoryProxy repository()
+ * @method        User|Proxy                     create(array|callable $attributes = [])
  */
 final class UserFactory extends ModelFactory
 {
-    private \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface $passwordEncoder;
+    private UserPasswordHasherInterface $userPasswordHasher;
 
-    public function __construct(\Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface $passwordEncoder)
+    public function __construct(UserPasswordHasherInterface $userPasswordHasher)
     {
         parent::__construct();
 
-        $this->passwordEncoder = $passwordEncoder;
+        $this->userPasswordHasher = $userPasswordHasher;
     }
 
     protected function getDefaults(): array
@@ -55,7 +55,7 @@ final class UserFactory extends ModelFactory
             ->afterInstantiate(function (User $user) {
                 if ($user->getPlainPassword()) {
                     $user->setPassword(
-                        $this->passwordEncoder->encodePassword($user, $user->getPlainPassword())
+                        $this->userPasswordHasher->hashPassword($user, $user->getPlainPassword())
                     );
                 }
             })

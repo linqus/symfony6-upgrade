@@ -13,7 +13,7 @@ class AdminController extends AbstractController
     /**
      * @Route("/admin", name="admin_dashboard")
      */
-    public function dashboard(ChartBuilderInterface $chartBuilder): \Symfony\Component\HttpFoundation\Response
+    public function dashboard(ChartBuilderInterface $chartBuilder): Response
     {
         $chart = $chartBuilder->createChart(Chart::TYPE_LINE);
         $chart->setData([

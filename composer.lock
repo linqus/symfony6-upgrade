@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "94037a6ac0c51777f6beeab7e578e5b4",
+    "content-hash": "4f415849da996fd99bec4b8eea4639ad",
     "packages": [
         {
             "name": "babdev/pagerfanta-bundle",
@@ -8223,38 +8223,37 @@
         },
         {
             "name": "symfony/ux-chartjs",
-            "version": "v1.3.0",
+            "version": "v2.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/ux-chartjs.git",
-                "reference": "e75ae488a6cfaf5e264f1fc4190785d914be8785"
+                "reference": "1dc192838f6bfbc30236cc971652ee049263274a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/ux-chartjs/zipball/e75ae488a6cfaf5e264f1fc4190785d914be8785",
-                "reference": "e75ae488a6cfaf5e264f1fc4190785d914be8785",
+                "url": "https://api.github.com/repos/symfony/ux-chartjs/zipball/1dc192838f6bfbc30236cc971652ee049263274a",
+                "reference": "1dc192838f6bfbc30236cc971652ee049263274a",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.2.5",
-                "symfony/config": "^4.4.17|^5.0",
-                "symfony/dependency-injection": "^4.4.17|^5.0",
-                "symfony/http-kernel": "^4.4.17|^5.0"
+                "symfony/config": "^4.4.17|^5.0|^6.0",
+                "symfony/dependency-injection": "^4.4.17|^5.0|^6.0",
+                "symfony/http-kernel": "^4.4.17|^5.0|^6.0"
             },
             "conflict": {
-                "symfony/flex": "<1.13"
+                "symfony/flex": "<1.13",
+                "symfony/webpack-encore-bundle": "<1.11"
             },
             "require-dev": {
-                "symfony/framework-bundle": "^4.4.17|^5.0",
-                "symfony/phpunit-bridge": "^5.2",
-                "symfony/twig-bundle": "^4.4.17|^5.0",
-                "symfony/var-dumper": "^4.4.17|^5.0"
+                "symfony/framework-bundle": "^4.4.17|^5.0|^6.0",
+                "symfony/phpunit-bridge": "^5.2|^6.0",
+                "symfony/twig-bundle": "^4.4.17|^5.0|^6.0",
+                "symfony/var-dumper": "^4.4.17|^5.0|^6.0",
+                "symfony/webpack-encore-bundle": "^1.11"
             },
             "type": "symfony-bundle",
             "extra": {
-                "branch-alias": {
-                    "dev-main": "1.3-dev"
-                },
                 "thanks": {
                     "name": "symfony/ux",
                     "url": "https://github.com/symfony/ux"
@@ -8262,11 +8261,8 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Symfony\\UX\\Chartjs\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
+                    "Symfony\\UX\\Chartjs\\": "src/"
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -8288,7 +8284,7 @@
                 "symfony-ux"
             ],
             "support": {
-                "source": "https://github.com/symfony/ux-chartjs/tree/v1.3.0"
+                "source": "https://github.com/symfony/ux-chartjs/tree/v2.7.1"
             },
             "funding": [
                 {
@@ -8304,7 +8300,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-05-20T17:58:12+00:00"
+            "time": "2023-01-24T15:40:19+00:00"
         },
         {
             "name": "symfony/validator",

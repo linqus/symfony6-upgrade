@@ -9,53 +9,33 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ORM\Entity(repositoryClass=UserRepository::class)
- *
- * @ORM\Table(name="`user`")
- */
+#[ORM\Table(name: '`user`')]
+#[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements UserInterface
 {
-    /**
-     * @ORM\Id
-     *
-     * @ORM\GeneratedValue
-     *
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=180, unique=true)
-     */
+    #[ORM\Column(type: 'string', length: 180, unique: true)]
     private ?string $email = null;
 
-    /**
-     * @ORM\Column(type="json")
-     */
+    #[ORM\Column(type: 'json')]
     private array $roles = [];
 
-    /**
-     *
-     * @ORM\Column(type="string")
-     */
+    #[ORM\Column(type: 'string')]
     private ?string $password = null;
 
     private ?string $plainPassword = null;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private ?string $firstName = null;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Question::class, mappedBy="owner")
-     */
+    #[ORM\OneToMany(targetEntity: Question::class, mappedBy: 'owner')]
     private  $questions;
 
-    /**
-     * @ORM\Column(type="boolean")
-     */
+    #[ORM\Column(type: 'boolean')]
     private bool $isVerified = false;
 
     public function __construct()
@@ -196,9 +176,7 @@ class User implements UserInterface
         return $this;
     }
 
-    /**
-     * @Groups("user:read")
-     */
+    #[Groups('user:read')]
     public function getAvatarUri(int $size = 32): string
     {
         return 'https://ui-avatars.com/api/?'.http_build_query([

@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Answer;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
@@ -9,6 +10,9 @@ use LDAP\Result;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Entity\Question;
+use App\Entity\Topic;
+use App\Entity\User;
 
 class DashboardController extends AbstractDashboardController
 {
@@ -44,6 +48,11 @@ class DashboardController extends AbstractDashboardController
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-dashboard');
+        yield MenuItem::linkToCrud('Questions', 'fa fa-question-circle', Question::class);
+        yield MenuItem::linkToCrud('Answers', 'fas fa-comments', Answer::class);
+        yield MenuItem::linkToCrud('Topics', 'fas fa-folder', Topic::class);
+        yield MenuItem::linkToCrud('Users', 'fas fa-users', User::class);
+        
         // yield MenuItem::linkToCrud('The Label', 'fas fa-list', EntityClass::class);
     }
 }

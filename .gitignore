@@ -23,3 +23,5 @@ yarn-error.log
 
 /tools/php-cs-fixer/vendor
 /.php-cs-fixer.cache
+
+/public/uploads

@@ -13,6 +13,12 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Entity\Question;
 use App\Entity\Topic;
 use App\Entity\User;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use Symfony\Component\Security\Core\User\UserInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Config\UserMenu;
 
 class DashboardController extends AbstractDashboardController
 {
@@ -45,14 +51,39 @@ class DashboardController extends AbstractDashboardController
             ->setTitle('Cauldron Overflow Admin');
     }
 
+    public function configureUserMenu(UserInterface $user): UserMenu
+    {
+        if (!$user instanceof User) {
+            throw new \Exception('Wrong user!');
+        } 
+
+        return parent::configureUserMenu($user)
+                ->setAvatarUrl($user->getAvatarUrl())
+                ->setMenuItems([
+                    MenuItem::linkToUrl('My profile','fas fa-user',$this->generateUrl('app_profile_show'))
+                ]);
+    }
+
     public function configureMenuItems(): iterable
     {
-        yield MenuItem::linkToDashboard('Dashboard', 'fa fa-dashboard');
+        yield MenuItem::linkToDashboard('Dashboard', 'fas fa-dashboard');
         yield MenuItem::linkToCrud('Questions', 'fa fa-question-circle', Question::class);
         yield MenuItem::linkToCrud('Answers', 'fas fa-comments', Answer::class);
         yield MenuItem::linkToCrud('Topics', 'fas fa-folder', Topic::class);
         yield MenuItem::linkToCrud('Users', 'fas fa-users', User::class);
+        yield MenuItem::linkToUrl('Homepage','fas fa-home',$this->generateUrl('app_homepage'));
         
         // yield MenuItem::linkToCrud('The Label', 'fas fa-list', EntityClass::class);
+    }
+
+    public function configureAssets(): Assets
+    {
+        return parent::configureAssets()
+                ->addWebpackEncoreEntry('admin');
+    }
+
+    public function configureActions(): Actions
+    {
+        return parent::configureActions()->add(Crud::PAGE_INDEX, Action::DETAIL);
     }
 }

@@ -4,8 +4,7 @@ namespace App\DataFixtures;
 
 use App\Factory\AnswerFactory;
 use App\Factory\QuestionFactory;
-use App\Factory\QuestionTagFactory;
-use App\Factory\TagFactory;
+use App\Factory\TopicFactory;
 use App\Factory\UserFactory;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -14,46 +13,53 @@ class AppFixtures extends Fixture
 {
     public function load(ObjectManager $manager)
     {
-        UserFactory::createOne([
-            'email' => 'abraca_admin@example.com',
-            'roles' => ['ROLE_ADMIN'],
-        ]);
-        UserFactory::createOne([
-            'email' => 'abraca_user@example.com',
-        ]);
-        UserFactory::createMany(10);
+        // Load Users
+        UserFactory::new()
+            ->withAttributes([
+                'email' => 'superadmin@example.com',
+                'plainPassword' => 'adminpass',
+            ])
+            ->promoteRole('ROLE_SUPER_ADMIN')
+            ->create();
 
-        TagFactory::createMany(100);
+        UserFactory::new()
+            ->withAttributes([
+                'email' => 'admin@example.com',
+                'plainPassword' => 'adminpass',
+            ])
+            ->promoteRole('ROLE_ADMIN')
+            ->create();
 
-        $questions = QuestionFactory::createMany(20, function () {
-            return [
-                'owner' => UserFactory::random(),
-            ];
-        });
+        UserFactory::new()
+            ->withAttributes([
+                'email' => 'moderatoradmin@example.com',
+                'plainPassword' => 'adminpass',
+            ])
+            ->promoteRole('ROLE_MODERATOR')
+            ->create();
 
-        QuestionTagFactory::createMany(100, function () {
-            return [
-                'tag' => TagFactory::random(),
-                'question' => QuestionFactory::random(),
-            ];
-        });
+        UserFactory::new()
+            ->withAttributes([
+                'email' => 'tisha@symfonycasts.com',
+                'plainPassword' => 'tishapass',
+                'firstName' => 'Tisha',
+                'lastName' => 'The Cat',
+                'avatar' => 'tisha.png',
+            ])
+            ->create();
+
+        // Load Topics
+        TopicFactory::new()->createMany(5);
+
+        // Load Questions
+        QuestionFactory::new()->createMany(20);
 
         QuestionFactory::new()
             ->unpublished()
-            ->many(5)
-            ->create()
-        ;
+            ->createMany(5);
 
-        AnswerFactory::createMany(100, function () use ($questions) {
-            return [
-                'question' => $questions[array_rand($questions)],
-            ];
-        });
-        AnswerFactory::new(function () use ($questions) {
-            return [
-                'question' => $questions[array_rand($questions)],
-            ];
-        })->needsApproval()->many(20)->create();
+        // Load Answers
+        AnswerFactory::new()->createMany(100);
 
         $manager->flush();
     }

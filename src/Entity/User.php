@@ -5,43 +5,62 @@ namespace App\Entity;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ORM\Table(name: '`user`')]
-#[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\Entity(UserRepository::class)]
+#[ORM\Table('`user`')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    use TimestampableEntity;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column()]
-    private ?int $id = null;
+    #[ORM\Column]
+    private ?int $id;
 
     #[ORM\Column(length: 180, unique: true)]
-    private ?string $email = null;
+    private ?string $email;
 
-    #[ORM\Column(type: 'json')]
+    #[ORM\Column(type: Types::JSON)]
     private array $roles = [];
 
-    #[ORM\Column()]
-    private ?string $password = null;
+    /**
+     * The hashed password
+     */
+    #[ORM\Column]
+    private ?string $password;
 
-    private ?string $plainPassword = null;
+    /**
+     * The plain non-persisted password
+     */
+    private ?string $plainPassword;
 
-    #[ORM\Column()]
-    private ?string $firstName = null;
+    #[ORM\Column]
+    private bool $enabled = true;
 
-    #[ORM\OneToMany(targetEntity: Question::class, mappedBy: 'owner')]
+    #[ORM\Column]
+    private ?string $firstName;
+
+    #[ORM\Column]
+    private ?string $lastName;
+
+    #[ORM\Column(nullable: true)]
+    private ?string $avatar;
+
+    #[ORM\OneToMany('askedBy', Question::class)]
     private Collection $questions;
 
-    #[ORM\Column()]
-    private bool $isVerified = false;
+    #[ORM\OneToMany('answeredBy', Answer::class)]
+    private Collection $answers;
 
     public function __construct()
     {
         $this->questions = new ArrayCollection();
+        $this->answers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -72,6 +91,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
+     * @deprecated since Symfony 5.3, use getUserIdentifier instead
+     */
+    public function getUsername(): string
+    {
+        return (string) $this->email;
+    }
+
+    /**
      * @see UserInterface
      */
     public function getRoles(): array
@@ -91,7 +118,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @see UserInterface
+     * @see PasswordAuthenticatedUserInterface
      */
     public function getPassword(): string
     {
@@ -105,14 +132,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getPlainPassword(): ?string
+    public function getPlainPassword(): string
     {
         return $this->plainPassword;
     }
 
-    public function setPlainPassword(?string $plainPassword): void
+    public function setPlainPassword(string $plainPassword): void
     {
         $this->plainPassword = $plainPassword;
+    }
+
+    /**
+     * Returning a salt is only needed, if you are not using a modern
+     * hashing algorithm (e.g. bcrypt or sodium) in your security.yaml.
+     *
+     * @see UserInterface
+     */
+    public function getSalt(): ?string
+    {
+        return null;
     }
 
     /**
@@ -121,7 +159,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function eraseCredentials()
     {
         // If you store any temporary, sensitive data on the user, clear it here
-        $this->plainPassword = null;
+         $this->plainPassword = null;
+    }
+
+    public function isEnabled(): bool
+    {
+        return $this->enabled;
+    }
+
+    public function setEnabled(bool $enabled): void
+    {
+        $this->enabled = $enabled;
     }
 
     public function getFirstName(): ?string
@@ -129,11 +177,47 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->firstName;
     }
 
-    public function setFirstName(string $firstName): self
+    public function setFirstName(string $firstName): void
     {
         $this->firstName = $firstName;
+    }
 
-        return $this;
+    public function getLastName(): ?string
+    {
+        return $this->lastName;
+    }
+
+    public function setLastName(string $lastName): void
+    {
+        $this->lastName = $lastName;
+    }
+
+    public function getFullName(): ?string
+    {
+        return $this->firstName.' '.$this->lastName;
+    }
+
+    public function getAvatar(): ?string
+    {
+        return $this->avatar;
+    }
+
+    public function getAvatarUrl(): ?string
+    {
+        if (!$this->avatar) {
+            return null;
+        }
+
+        if (strpos($this->avatar, '/') !== false) {
+            return $this->avatar;
+        }
+
+        return sprintf('/uploads/avatars/%s', $this->avatar);
+    }
+
+    public function setAvatar(?string $avatar): void
+    {
+        $this->avatar = $avatar;
     }
 
     /**
@@ -148,7 +232,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->questions->contains($question)) {
             $this->questions[] = $question;
-            $question->setOwner($this);
+            $question->setAskedBy($this);
         }
 
         return $this;
@@ -158,37 +242,40 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->questions->removeElement($question)) {
             // set the owning side to null (unless already changed)
-            if ($question->getOwner() === $this) {
-                $question->setOwner(null);
+            if ($question->getAskedBy() === $this) {
+                $question->setAskedBy(null);
             }
         }
 
         return $this;
     }
 
-    #[Groups('user:read')]
-    public function getAvatarUri(int $size = 32): string
+    /**
+     * @return Collection|Answer[]
+     */
+    public function getAnswers(): Collection
     {
-        return 'https://ui-avatars.com/api/?'.http_build_query([
-                'name' => $this->getDisplayName(),
-                'size' => $size,
-                'background' => 'random',
-            ]);
+        return $this->answers;
     }
 
-    public function getDisplayName(): string
+    public function addAnswer(Answer $answer): self
     {
-        return $this->getFirstName() ?: $this->getEmail();
+        if (!$this->answers->contains($answer)) {
+            $this->answers[] = $answer;
+            $answer->setAnsweredBy($this);
+        }
+
+        return $this;
     }
 
-    public function getIsVerified(): ?bool
+    public function removeAnswer(Answer $answer): self
     {
-        return $this->isVerified;
-    }
-
-    public function setIsVerified(bool $isVerified): self
-    {
-        $this->isVerified = $isVerified;
+        if ($this->answers->removeElement($answer)) {
+            // set the owning side to null (unless already changed)
+            if ($answer->getAnsweredBy() === $this) {
+                $answer->setAnsweredBy(null);
+            }
+        }
 
         return $this;
     }

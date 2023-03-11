@@ -4,11 +4,9 @@ namespace App\Controller;
 
 use App\Entity\Question;
 use App\Repository\QuestionRepository;
+use App\Service\MarkdownHelper;
 use Doctrine\ORM\EntityManagerInterface;
-use Pagerfanta\Doctrine\ORM\QueryAdapter;
-use Pagerfanta\Pagerfanta;
 use Psr\Log\LoggerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,34 +14,38 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class QuestionController extends AbstractController
 {
-    public function __construct(private LoggerInterface $logger, private bool $isDebug)
+    private $logger;
+    private $isDebug;
+
+    public function __construct(LoggerInterface $logger, bool $isDebug)
     {
+        $this->logger = $logger;
+        $this->isDebug = $isDebug;
     }
 
-    #[Route(path: '/{page<\d+>}', name: 'app_homepage')]
-    public function homepage(QuestionRepository $repository, int $page = 1): Response
+    #[Route('/', name: 'app_homepage')]
+    public function homepage(QuestionRepository $repository)
     {
-        $queryBuilder = $repository->createAskedOrderedByNewestQueryBuilder();
-
-        $pagerfanta = new Pagerfanta(new QueryAdapter($queryBuilder));
-        $pagerfanta->setMaxPerPage(5);
-        $pagerfanta->setCurrentPage($page);
+        $questions = $repository->findAllApprovedOrderedByNewest();
 
         return $this->render('question/homepage.html.twig', [
-            'pager' => $pagerfanta,
+            'questions' => $questions,
         ]);
     }
 
-    #[Route(path: '/questions/new')]
-    #[IsGranted('ROLE_USER')]
+    #[Route('/questions/new')]
     public function new()
     {
         return new Response('Sounds like a GREAT feature for V2!');
     }
 
-    #[Route(path: '/questions/{slug}', name: 'app_question_show')]
-    public function show(Question $question): Response
+    #[Route('/questions/{slug}', name: 'app_question_show')]
+    public function show(Question $question)
     {
+        if (!$question->getIsApproved()) {
+            throw $this->createNotFoundException(sprintf('Question %s has not been approved yet', $question->getId()));
+        }
+
         if ($this->isDebug) {
             $this->logger->info('We are in debug mode!');
         }
@@ -53,18 +55,8 @@ class QuestionController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/questions/edit/{slug}', name: 'app_question_edit')]
-    public function edit(Question $question): Response
-    {
-        $this->denyAccessUnlessGranted('EDIT', $question);
-
-        return $this->render('question/edit.html.twig', [
-            'question' => $question,
-        ]);
-    }
-
-    #[Route(path: '/questions/{slug}/vote', name: 'app_question_vote', methods: 'POST')]
-    public function questionVote(Question $question, Request $request, EntityManagerInterface $entityManager): \Symfony\Component\HttpFoundation\RedirectResponse
+    #[Route('/questions/{slug}/vote', name: 'app_question_vote', methods: 'POST')]
+    public function questionVote(Question $question, Request $request, EntityManagerInterface $entityManager)
     {
         $direction = $request->request->get('direction');
 
@@ -77,7 +69,7 @@ class QuestionController extends AbstractController
         $entityManager->flush();
 
         return $this->redirectToRoute('app_question_show', [
-            'slug' => $question->getSlug(),
+            'slug' => $question->getSlug()
         ]);
     }
 }

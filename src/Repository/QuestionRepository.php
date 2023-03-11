@@ -20,23 +20,57 @@ class QuestionRepository extends ServiceEntityRepository
         parent::__construct($registry, Question::class);
     }
 
-    public function createAskedOrderedByNewestQueryBuilder(): QueryBuilder
+    public function findLatest(): array
     {
-        return $this->addIsAskedQueryBuilder()
-            ->orderBy('q.askedAt', 'DESC')
-            ->leftJoin('q.questionTags', 'question_tag')
-            ->innerJoin('question_tag.tag', 'tag')
-            ->addSelect('question_tag', 'tag');
+        return $this->createQueryBuilder('question')
+            ->orderBy('question.createdAt', 'DESC')
+            ->setMaxResults(3)
+            ->getQuery()
+            ->getResult();
     }
 
-    private function addIsAskedQueryBuilder(QueryBuilder $qb = null): QueryBuilder
+    public function findTopVoted(): array
+    {
+        return $this->createQueryBuilder('question')
+            ->orderBy('question.votes', 'DESC')
+            ->setMaxResults(5)
+            ->getQuery()
+            ->getResult();
+    }
+
+     /**
+      * @return Question[] Returns an array of Question objects
+      */
+    public function findAllApprovedOrderedByNewest()
+    {
+        return $this->addIsApprovedQueryBuilder()
+            ->orderBy('q.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    private function addIsApprovedQueryBuilder(QueryBuilder $qb = null): QueryBuilder
     {
         return $this->getOrCreateQueryBuilder($qb)
-            ->andWhere('q.askedAt IS NOT NULL');
+            ->andWhere('q.isApproved = :approved')
+            ->setParameter('approved', true);
     }
 
     private function getOrCreateQueryBuilder(QueryBuilder $qb = null): QueryBuilder
     {
         return $qb ?: $this->createQueryBuilder('q');
     }
+
+    /*
+    public function findOneBySomeField($value): ?Question
+    {
+        return $this->createQueryBuilder('q')
+            ->andWhere('q.exampleField = :val')
+            ->setParameter('val', $value)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+    */
 }

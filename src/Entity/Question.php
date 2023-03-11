@@ -2,57 +2,59 @@
 
 namespace App\Entity;
 
-use App\Repository\AnswerRepository;
 use App\Repository\QuestionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
-use Gedmo\Mapping\Annotation\Slug;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 
-
-#[ORM\Entity(repositoryClass: QuestionRepository::class)]
+#[ORM\Entity(QuestionRepository::class)]
 class Question
 {
     use TimestampableEntity;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column()]
-    private ?int $id = null;
+    #[ORM\Column]
+    private ?int $id;
 
-    #[ORM\Column()]
-    private ?string $name = null;
+    #[ORM\Column]
+    private ?string $name;
 
-    #[Slug(fields: ['name'])]
+    /**
+     * @Gedmo\Slug(fields={"name"})
+     */
     #[ORM\Column(length: 100, unique: true)]
-    private ?string $slug = null;
+    private ?string $slug;
 
-    #[ORM\Column(type: 'text')]
-    private ?string $question = null;
-
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private ?\DateTimeInterface $askedAt = null;
-
-    #[ORM\Column(type: 'integer')]
-    private int $votes = 0;
-
-    #[ORM\OneToMany(targetEntity: Answer::class, mappedBy: 'question', fetch: 'EXTRA_LAZY')]
-    #[ORM\OrderBy(['createdAt' => 'DESC'])]
-    private Collection $answers;
-
-    #[ORM\OneToMany(targetEntity: QuestionTag::class, mappedBy: 'question')]
-    private Collection $questionTags;
+    #[ORM\Column(type: Types::TEXT)]
+    private ?string $question;
 
     #[ORM\ManyToOne(inversedBy: 'questions')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $owner = null;
+    private User $askedBy;
+
+    #[ORM\Column]
+    private int $votes = 0;
+
+    #[ORM\OneToMany('question', Answer::class)]
+    private Collection $answers;
+
+    #[ORM\ManyToOne(inversedBy: 'questions')]
+    #[ORM\JoinColumn(nullable: false)]
+    private Topic $topic;
+
+    #[ORM\Column]
+    private bool $isApproved = false;
+
+    #[ORM\ManyToOne]
+    private User $updatedBy;
 
     public function __construct()
     {
         $this->answers = new ArrayCollection();
-        $this->questionTags = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -96,14 +98,14 @@ class Question
         return $this;
     }
 
-    public function getAskedAt(): ?\DateTimeInterface
+    public function getAskedBy(): ?User
     {
-        return $this->askedAt;
+        return $this->askedBy;
     }
 
-    public function setAskedAt(?\DateTimeInterface $askedAt): self
+    public function setAskedBy(?User $askedBy): self
     {
-        $this->askedAt = $askedAt;
+        $this->askedBy = $askedBy;
 
         return $this;
     }
@@ -129,14 +131,14 @@ class Question
 
     public function upVote(): self
     {
-        ++$this->votes;
+        $this->votes++;
 
         return $this;
     }
 
     public function downVote(): self
     {
-        --$this->votes;
+        $this->votes--;
 
         return $this;
     }
@@ -147,11 +149,6 @@ class Question
     public function getAnswers(): Collection
     {
         return $this->answers;
-    }
-
-    public function getApprovedAnswers(): Collection
-    {
-        return $this->answers->matching(AnswerRepository::createApprovedCriteria());
     }
 
     public function addAnswer(Answer $answer): self
@@ -176,45 +173,35 @@ class Question
         return $this;
     }
 
-    /**
-     * @return Collection|QuestionTag[]
-     */
-    public function getQuestionTags(): Collection
+    public function getTopic(): ?Topic
     {
-        return $this->questionTags;
+        return $this->topic;
     }
 
-    public function addQuestionTag(QuestionTag $questionTag): self
+    public function setTopic(?Topic $topic): self
     {
-        if (!$this->questionTags->contains($questionTag)) {
-            $this->questionTags[] = $questionTag;
-            $questionTag->setQuestion($this);
-        }
+        $this->topic = $topic;
 
         return $this;
     }
 
-    public function removeQuestionTag(QuestionTag $questionTag): self
+    public function getIsApproved(): bool
     {
-        if ($this->questionTags->removeElement($questionTag)) {
-            // set the owning side to null (unless already changed)
-            if ($questionTag->getQuestion() === $this) {
-                $questionTag->setQuestion(null);
-            }
-        }
-
-        return $this;
+        return $this->isApproved;
     }
 
-    public function getOwner(): ?User
+    public function setIsApproved(bool $isApproved): void
     {
-        return $this->owner;
+        $this->isApproved = $isApproved;
     }
 
-    public function setOwner(?User $owner): self
+    public function getUpdatedBy(): ?User
     {
-        $this->owner = $owner;
+        return $this->updatedBy;
+    }
 
-        return $this;
+    public function setUpdatedBy(User $updatedBy): void
+    {
+        $this->updatedBy = $updatedBy;
     }
 }

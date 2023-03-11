@@ -9,11 +9,8 @@ use Symfony\Contracts\Cache\CacheInterface;
 class MarkdownHelper
 {
     private $markdownParser;
-
     private $cache;
-
     private $isDebug;
-
     private $logger;
 
     public function __construct(MarkdownParserInterface $markdownParser, CacheInterface $cache, bool $isDebug, LoggerInterface $mdLogger)
@@ -34,7 +31,7 @@ class MarkdownHelper
             return $this->markdownParser->transformMarkdown($source);
         }
 
-        return $this->cache->get('markdown_'.md5($source), function () use ($source) {
+        return $this->cache->get('markdown_'.md5($source), function() use ($source) {
             return $this->markdownParser->transformMarkdown($source);
         });
     }

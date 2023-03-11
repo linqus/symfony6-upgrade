@@ -1,4 +1,10 @@
 security:
+    role_hierarchy:
+        ROLE_ADMIN: [ ROLE_USER ]
+        ROLE_MODERATOR: [ ROLE_USER, ROLE_ADMIN ]
+        ROLE_SUPER_ADMIN: [ ROLE_USER, ROLE_ADMIN, ROLE_MODERATOR, ROLE_ALLOWED_TO_SWITCH ]
+
+    # enable_authenticator_manager: true # is now enabled by deafult 
     # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
@@ -16,8 +22,7 @@ security:
         main:
             lazy: true
             provider: app_user_provider
-            custom_authenticator:
-                - App\Security\LoginFormAuthenticator
+            custom_authenticator: App\Security\AppAuthenticator
             logout:
                 path: app_logout
                 # where to redirect after logout
@@ -32,12 +37,8 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # This makes the logout route accessible during two-factor authentication. Allows the user to
-        # cancel two-factor authentication, if they need to.
-        - { path: ^/logout, role: PUBLIC_ACCESS }
-        - { path: ^/admin/login, roles: PUBLIC_ACCESS }
-        - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        # - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/profile, roles: ROLE_USER }
 
 when@test:
     security:

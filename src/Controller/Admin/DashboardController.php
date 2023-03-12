@@ -86,4 +86,12 @@ class DashboardController extends AbstractDashboardController
     {
         return parent::configureActions()->add(Crud::PAGE_INDEX, Action::DETAIL);
     }
+
+    public function configureCrud(): Crud
+    {
+        return Parent::configureCrud()
+                ->setDefaultSort([
+                    'id' => 'DESC'
+                ]);
+    }
 }

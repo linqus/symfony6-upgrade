@@ -25,7 +25,8 @@ class QuestionCrudController extends AbstractCrudController
     {
         yield IdField::new('id')
                 ->onlyOnIndex();
-        yield Field::new('name');
+        yield Field::new('name')
+                ->setSortable(false);
         yield Field::new('slug')
                 ->hideOnIndex()
                 ->setFormTypeOptions([

@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\EasyAdmin\VoteField;
 use App\Entity\Answer;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\Field;
@@ -32,5 +33,13 @@ class AnswerCrudController extends AbstractCrudController
             ->hideOnForm();
         yield Field::new('updatedAt')
             ->onlyOnDetail();
+    }
+
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud->setDefaultSort([
+            'answeredBy.enabled' => 'DESC',
+            'createdAt' => 'DESC'
+        ]);
     }
 }

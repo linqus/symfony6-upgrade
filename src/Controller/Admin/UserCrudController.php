@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\User;
 use DateTime;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AvatarField;
@@ -29,7 +30,9 @@ class UserCrudController extends AbstractCrudController
         yield IdField::new('id')
                 ->onlyOnIndex();
         yield AvatarField::new('avatar')
-                ->formatValue(static function($value, User $user) {return $user->getAvatarUrl();} )
+                ->formatValue(static function($value, ?User $user) {
+                        return $user?->getAvatarUrl();
+                })
                 ->hideOnForm();
         yield ImageField::new('avatar')
                 ->setUploadDir('public/uploads/avatars')
@@ -61,4 +64,9 @@ class UserCrudController extends AbstractCrudController
     
     }
     
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud
+                ->setEntityPermission('ADMIN_USER_EDIT');
+    }
 }

@@ -8,12 +8,15 @@ use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\Field;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_MODERATOR')]
 class QuestionCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string
@@ -47,7 +50,8 @@ class QuestionCrudController extends AbstractCrudController
                 ->setHelp('Preview:')
                 ->hideOnIndex();
         yield VoteField::new('votes','Total Votes')
-                ->setTextAlign('right');
+                ->setTextAlign('right')
+                ->setPermission('ROLE_SUPER_ADMIN');
         yield AssociationField::new('askedBy')
                 ->formatValue(static function($value, Question $question){
                     if (! $user=$question->getAskedBy()) {
@@ -81,4 +85,14 @@ class QuestionCrudController extends AbstractCrudController
                 ->setPermission(Action::BATCH_DELETE,'ROLE_SUPER_ADMIN')
                 ->setPermission(Action::NEW,'ROLE_SUPER_ADMIN');
             }
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        return parent::configureFilters($filters)
+                ->add('name')
+                ->add('createdAt')
+                ->add('votes')
+                ->add('answers')
+                ->add('askedBy');
+    }
 }

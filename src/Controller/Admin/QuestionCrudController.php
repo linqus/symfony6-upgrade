@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\EasyAdmin\VoteField;
 use App\Entity\Question;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
@@ -73,6 +74,8 @@ class QuestionCrudController extends AbstractCrudController
                 ]);
         yield Field::new('createdAt')
                 ->hideOnForm();
+        yield AssociationField::new('updatedBy')
+                ->onlyOnDetail();
     }
 
     public function configureActions(Actions $actions): Actions
@@ -94,5 +97,15 @@ class QuestionCrudController extends AbstractCrudController
                 ->add('votes')
                 ->add('answers')
                 ->add('askedBy');
+    }
+
+    public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        
+        $user = $this->getUser();
+
+        $entityInstance->setUpdatedBy($user);
+
+        parent::updateEntity($entityManager, $entityInstance);
     }
 }

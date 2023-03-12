@@ -4,6 +4,7 @@ namespace App\EasyAdmin;
 
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Field\FieldInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FieldTrait;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 
 class VoteField implements FieldInterface
 {

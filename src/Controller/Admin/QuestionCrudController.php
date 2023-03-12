@@ -11,7 +11,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\Field;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 class QuestionCrudController extends AbstractCrudController
 {
@@ -34,6 +33,16 @@ class QuestionCrudController extends AbstractCrudController
                 ]);
         yield AssociationField::new('topic');
         yield TextareaField::new('question')
+                ->setFormTypeOptions([
+                    'row_attr' => [
+                        'data-controller' => 'snarkdown',
+                    ],
+                    'attr'=>[
+                        'data-snarkdown-target'=>'input',
+                        'data-action'=>'snarkdown#render'
+                    ]
+                ])
+                ->setHelp('Preview:')
                 ->hideOnIndex();
         yield VoteField::new('votes','Total Votes')
                 ->setTextAlign('right');

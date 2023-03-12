@@ -1,0 +1,5 @@
+{% if field.value >= 0 %}
+    <span class="fas fa-thumbs-up text-success"> {{ field.formattedValue}}</span>
+{% else %}
+    <span class="fas fa-thumbs-down text-warning"> {{ field.formattedValue}}</span>
+{% endif %}

@@ -13,21 +13,35 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Entity\Question;
 use App\Entity\Topic;
 use App\Entity\User;
+use App\Repository\QuestionRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use Symfony\Component\Security\Core\User\UserInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\UserMenu;
+use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
+use Symfony\UX\Chartjs\Model\Chart;
 
 class DashboardController extends AbstractDashboardController
 {
+
+    public function __construct(private QuestionRepository $questionRepository,
+                                private ChartBuilderInterface $chartBuilder) {}
+
     #[IsGranted('ROLE_ADMIN')]
     #[Route('/admin', name: 'admin')]
     public function index(): Response
     {
-        //return parent::index();
-        return $this->render('admin/index.html.twig');
+        $latestQuestions = $this->questionRepository->findLatest();
+        $topVoted = $this->questionRepository->findTopVoted();
+
+
+        return $this->render('admin/index.html.twig',[
+            'latestQuestions' => $latestQuestions,
+            'topVoted' => $topVoted,
+            'chart' => $this->buildChart(),
+        ]);
         // Option 1. You can make your dashboard redirect to some common page of your backend
         //
         // $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
@@ -92,6 +106,33 @@ class DashboardController extends AbstractDashboardController
         return Parent::configureCrud()
                 ->setDefaultSort([
                     'id' => 'DESC'
-                ]);
+                ])
+                ->overrideTemplate('crud/field/id','admin/field/id_with_icon.html.twig');
+    }
+
+    public function buildChart(): Chart
+    {
+        $chart = $this->chartBuilder->createChart(Chart::TYPE_LINE);
+        $chart->setData([
+            'labels' => ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+            'datasets' => [
+                [
+                    'label' => 'My First dataset',
+                    'backgroundColor' => 'rgb(255, 99, 132)',
+                    'borderColor' => 'rgb(255, 99, 132)',
+                    'data' => [0, 10, 5, 2, 20, 30, 45],
+                ],
+            ],
+        ]);
+        $chart->setOptions([
+            'scales' => [
+                'y' => [
+                   'suggestedMin' => 0,
+                   'suggestedMax' => 100,
+                ],
+            ],
+        ]);
+
+        return $chart;
     }
 }

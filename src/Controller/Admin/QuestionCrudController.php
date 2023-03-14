@@ -80,14 +80,24 @@ class QuestionCrudController extends AbstractCrudController
 
     public function configureActions(Actions $actions): Actions
     {
-        return $actions
-                ->setPermission(Action::INDEX,'ROLE_MODERATOR')
-                ->setPermission(Action::EDIT,'ROLE_MODERATOR')
-                ->setPermission(Action::DETAIL,'ROLE_MODERATOR')
-                ->setPermission(Action::DELETE,'ROLE_SUPER_ADMIN')
-                ->setPermission(Action::BATCH_DELETE,'ROLE_SUPER_ADMIN')
-                ->setPermission(Action::NEW,'ROLE_SUPER_ADMIN');
-            }
+        
+        $newActions = $actions
+        ->update(Crud::PAGE_INDEX,Action::DELETE, function(Action $action) {
+            $action->displayIf(function(Question $question) {
+                return 1 || !$question->getIsApproved();
+            });
+            //dd($action);
+            return $action;
+        })
+        ->setPermission(Action::INDEX,'ROLE_MODERATOR')
+        ->setPermission(Action::EDIT,'ROLE_MODERATOR')
+        ->setPermission(Action::DETAIL,'ROLE_MODERATOR')
+        ->setPermission(Action::DELETE,'ROLE_SUPER_ADMIN')
+        ->setPermission(Action::BATCH_DELETE,'ROLE_SUPER_ADMIN')
+        ->setPermission(Action::NEW,'ROLE_SUPER_ADMIN');
+
+        return $newActions;
+    }
 
     public function configureFilters(Filters $filters): Filters
     {
@@ -97,6 +107,19 @@ class QuestionCrudController extends AbstractCrudController
                 ->add('votes')
                 ->add('answers')
                 ->add('askedBy');
+    }
+
+    /**
+     * @param Question $entityInstance
+     */
+    public function deleteEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        if ($entityInstance->getIsApproved()) {
+            throw new \Exception("Cannot delete approved question");
+        }
+
+        parent::deleteEntity($entityManager,$entityInstance);
+
     }
 
     public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void

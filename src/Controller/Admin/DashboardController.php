@@ -113,7 +113,9 @@ class DashboardController extends AbstractDashboardController
 
     public function configureActions(): Actions
     {
-        return parent::configureActions()->add(Crud::PAGE_INDEX, Action::DETAIL);
+        return parent::configureActions()
+                ->add(Crud::PAGE_INDEX, Action::DETAIL)
+                ->add(Crud::PAGE_EDIT, Action::INDEX);
     }
 
     public function configureCrud(): Crud

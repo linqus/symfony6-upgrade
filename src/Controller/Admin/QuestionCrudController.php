@@ -4,18 +4,21 @@ namespace App\Controller\Admin;
 
 use App\EasyAdmin\VoteField;
 use App\Entity\Question;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\Field;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
+use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_MODERATOR')]
@@ -95,6 +98,16 @@ class QuestionCrudController extends AbstractCrudController
                     ->setLabel('View on page');
         };
             
+        $approveAction = Action::new('approve')
+            ->setIcon('fas fa-check-circle')
+            ->setLabel('Approve')
+            ->displayAsButton()
+            ->setTemplatePath('admin/approve_action.html.twig')
+            ->linkToCrudAction('approve')
+            ->displayIf(static function(Question $question) {
+                return !$question->getIsApproved();
+            });
+
         $newActions = $actions
 /*         ->update(Crud::PAGE_INDEX,Action::DELETE, function(Action $action) {
             $action->displayIf(function(Question $question) {
@@ -112,7 +125,9 @@ class QuestionCrudController extends AbstractCrudController
         ->setPermission(Action::NEW,'ROLE_SUPER_ADMIN')
         ->disable(Action::BATCH_DELETE)
         ->add(Action::DETAIL,$viewAction()->addCssClass('btn btn-success'))
-        ->add(Action::INDEX, $viewAction());
+        ->add(Action::INDEX, $viewAction())
+        ->add(Action::DETAIL, $approveAction);
+            
 
 
         return $newActions;
@@ -156,5 +171,24 @@ class QuestionCrudController extends AbstractCrudController
         return $crud
                ->setDefaultSort(['votes' => 'DESC'])
                ->showEntityActionsInlined();
+    }
+
+    public function approve(AdminContext $adminContext, EntityManagerInterface $entityManager, AdminUrlGenerator $adminUrlGenerator) 
+    {
+        $question = $adminContext->getEntity()->getInstance();
+
+        if (!$question instanceof Question) {
+            throw new \Exception('No question found');
+        }
+
+        $question->setIsApproved(true);
+        $entityManager->flush();
+
+        $url = $adminUrlGenerator
+                ->setController(self::class)
+                ->setAction(Crud::PAGE_DETAIL)
+                ->setEntityId($question->getId())
+                ->generateUrl();
+        return $this->redirect($url);
     }
 }

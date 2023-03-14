@@ -6,10 +6,15 @@ use App\Repository\TopicRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Blameable\Traits\BlameableEntity;
+use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 #[ORM\Entity(TopicRepository::class)]
 class Topic
 {
+   use TimestampableEntity;
+   // use BlameableEntity;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -20,6 +25,10 @@ class Topic
 
     #[ORM\OneToMany('topic', Question::class)]
     private Collection $questions;
+
+    #[ORM\ManyToOne]
+    private User $updatedBy;
+
 
     public function __construct()
     {
@@ -77,4 +86,15 @@ class Topic
 
         return $this;
     }
+
+    public function getUpdatedBy(): ?User
+    {
+        return $this->updatedBy;
+    }
+
+    public function setUpdatedBy(User $updatedBy): void
+    {
+        $this->updatedBy = $updatedBy;
+    }
+
 }

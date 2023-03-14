@@ -12,6 +12,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\Field;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
@@ -72,6 +73,8 @@ class QuestionCrudController extends AbstractCrudController
                 ->setFormTypeOptions([
                     'by_reference'=>false
                 ]);
+        yield BooleanField::new('isApproved')
+                ->hideOnIndex();
         yield Field::new('createdAt')
                 ->hideOnForm();
         yield AssociationField::new('updatedBy')
@@ -82,19 +85,21 @@ class QuestionCrudController extends AbstractCrudController
     {
         
         $newActions = $actions
-        ->update(Crud::PAGE_INDEX,Action::DELETE, function(Action $action) {
+/*         ->update(Crud::PAGE_INDEX,Action::DELETE, function(Action $action) {
             $action->displayIf(function(Question $question) {
-                return 1 || !$question->getIsApproved();
+                return !$question->getIsApproved();
             });
             //dd($action);
             return $action;
-        })
+        }) */
+        
         ->setPermission(Action::INDEX,'ROLE_MODERATOR')
         ->setPermission(Action::EDIT,'ROLE_MODERATOR')
         ->setPermission(Action::DETAIL,'ROLE_MODERATOR')
         ->setPermission(Action::DELETE,'ROLE_SUPER_ADMIN')
         ->setPermission(Action::BATCH_DELETE,'ROLE_SUPER_ADMIN')
-        ->setPermission(Action::NEW,'ROLE_SUPER_ADMIN');
+        ->setPermission(Action::NEW,'ROLE_SUPER_ADMIN')
+        ->disable(Action::BATCH_DELETE);
 
         return $newActions;
     }
@@ -130,5 +135,12 @@ class QuestionCrudController extends AbstractCrudController
         $entityInstance->setUpdatedBy($user);
 
         parent::updateEntity($entityManager, $entityInstance);
+    }
+
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud
+               ->setDefaultSort(['votes' => 'DESC'])
+               ->showEntityActionsInlined();
     }
 }

@@ -18,6 +18,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Menu\SubMenuItem;
 use Symfony\Component\Security\Core\User\UserInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\UserMenu;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
@@ -81,16 +82,25 @@ class DashboardController extends AbstractDashboardController
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linkToDashboard('Dashboard', 'fas fa-dashboard');
-        yield MenuItem::linkToCrud('Questions', 'fa fa-question-circle', Question::class)
-                ->setPermission('ROLE_MODERATOR')
-                ->setController(QuestionCrudController::class);
-        yield MenuItem::linkToCrud('Pending Approvals', 'far fa-question-circle', Question::class)
-                ->setPermission('ROLE_MODERATOR')
-                ->setController(PendingApprovalCrudController::class);
+        yield MenuItem::section('Content');
+        yield MenuItem::subMenu('Questions','fas fa-question-circle')
+                ->setSubItems([
+                    MenuItem::linkToCrud('All questions', 'fa fa-list', Question::class)
+                            ->setPermission('ROLE_MODERATOR')
+                            ->setController(QuestionCrudController::class),
+                    MenuItem::linkToCrud('Pending Approvals', 'fa fa-warning', Question::class)
+                            ->setPermission('ROLE_MODERATOR')
+                            ->setController(PendingApprovalCrudController::class),
+                ]);
+        
         yield MenuItem::linkToCrud('Answers', 'fas fa-comments', Answer::class);
         yield MenuItem::linkToCrud('Topics', 'fas fa-folder', Topic::class);
         yield MenuItem::linkToCrud('Users', 'fas fa-users', User::class);
+        yield MenuItem::section();
         yield MenuItem::linkToUrl('Homepage','fas fa-home',$this->generateUrl('app_homepage'));
+        yield MenuItem::linkToUrl('StackOverflow','fab fa-stack-overflow','https://stackoverflow.com')
+                ->setBadge('34','danger')
+                ->setLinkTarget('_blank');
         
         // yield MenuItem::linkToCrud('The Label', 'fas fa-list', EntityClass::class);
     }

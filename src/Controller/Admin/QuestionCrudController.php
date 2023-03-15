@@ -19,6 +19,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Factory\FilterFactory;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\Field;
+use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
@@ -38,15 +39,22 @@ class QuestionCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
+        yield FormField::addTab('Basic data','fa fa-car')
+                ->collapsible()
+                ->renderCollapsed();        
         yield IdField::new('id')
                 ->onlyOnIndex();
+
         yield Field::new('name')
-                ->setSortable(false);
+                ->setSortable(false)
+                ->setColumns(5);
         yield Field::new('slug')
                 ->hideOnIndex()
                 ->setFormTypeOptions([
                     'disabled' => $pageName !== crud::PAGE_NEW
-                ]);
+                ])
+                ->setColumns(5);
+
         yield AssociationField::new('topic');
         yield TextareaField::new('question')
                 ->setFormTypeOptions([
@@ -59,10 +67,15 @@ class QuestionCrudController extends AbstractCrudController
                     ]
                 ])
                 ->setHelp('Preview:')
-                ->hideOnIndex();
+                ->hideOnIndex()
+                ->setColumns(10);
         yield VoteField::new('votes','Total Votes')
                 ->setTextAlign('right')
                 ->setPermission('ROLE_SUPER_ADMIN');
+
+
+        yield FormField::addTab('Panel','fa fa-sun fa-pulse')
+                ->collapsible();
         yield AssociationField::new('askedBy')
                 ->formatValue(static function($value, Question $question){
                     if (! $user=$question->getAskedBy()) {

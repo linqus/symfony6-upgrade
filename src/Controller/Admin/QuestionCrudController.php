@@ -149,7 +149,14 @@ class QuestionCrudController extends AbstractCrudController
         ->add(Crud::PAGE_DETAIL,$viewAction()->addCssClass('btn btn-success'))
         ->add(Crud::PAGE_INDEX, $viewAction())
         ->add(Crud::PAGE_DETAIL, $approveAction)
-        ->add(Crud::PAGE_INDEX,$exportAction);
+        ->add(Crud::PAGE_INDEX,$exportAction)
+        ->reorder(Crud::PAGE_DETAIL,[
+            'approve',
+            'view',
+            Action::INDEX,
+            Action::EDIT,
+            Action::DELETE
+        ]);
             
 
 

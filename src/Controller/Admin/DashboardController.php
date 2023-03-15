@@ -113,7 +113,16 @@ class DashboardController extends AbstractDashboardController
     {
         return parent::configureActions()
                 ->add(Crud::PAGE_INDEX, Action::DETAIL)
-                ->add(Crud::PAGE_EDIT, Action::INDEX);
+                ->add(Crud::PAGE_EDIT, Action::INDEX)
+                ->update(Crud::PAGE_DETAIL, Action::EDIT, function (Action $action) {
+                    $action->setIcon('fas fa-edit');
+
+                    return $action;
+                })
+                ->update(Crud::PAGE_INDEX, Action::EDIT, function(Action $action) {
+                    return $action
+                            ->setIcon('fas fa-edit');
+                });
     }
 
     public function configureCrud(): Crud

@@ -19,7 +19,7 @@ class BeforeCrudActionSubscriber implements EventSubscriberInterface
         if (!$crudDto = $adminContext->getCrud()) {
             return;
         }
-        if (!$crudDto->getEntityFqcn() == Question::class) {
+        if ($crudDto->getEntityFqcn() !== Question::class) {
             return;
         }
         
